@@ -1,1 +1,45 @@
 
+#!name = 同花顺广告屏蔽
+#!desc = 深度过滤同花顺APP信息流广告、推荐位广告、弹窗广告、推送广告，兼容你原有recommend接口过滤逻辑，适配最新版客户端
+#!author = 自定义优化
+#!loon_version = 3.2.1(733)
+#!system = iOS,iPadOS
+#!tag = 去广告,同花顺
+#!icon = https://raw.githubusercontent.com/keywos/rule/main/icon/ths.png
+
+[General]
+force-http-engine = true
+
+[MITM]
+hostname = *.10jqka.com.cn, adm.10jqka.com.cn, push.10jqka.com.cn, notice.10jqka.com.cn
+
+[Script]
+# 核心推荐广告接口（完全兼容你原有脚本逻辑，增强版）
+http-response ^https?:\/\/adm\.10jqka\.com\.cn\/interface\/ad\/recommend script-path = https://raw.githubusercontent.com/Keywos/rule/main/script/ths/ths.js, requires-body = true, timeout = 10, tag = 同花顺推荐广告过滤, debug = true
+
+# 通用广告接口全量覆盖
+http-response ^https?:\/\/.*\.10jqka\.com\.cn.*\/ad\/ script-path = https://raw.githubusercontent.com/Keywos/rule/main/script/ths/ths.js, requires-body = true, timeout = 10, tag = 同花顺通用广告过滤, debug = true
+
+# 推送/通知广告拦截
+http-response ^https?:\/\/push\.10jqka\.com\.cn script-path = https://raw.githubusercontent.com/Keywos/rule/main/script/ths/ths.js, requires-body = true, timeout = 10, tag = 同花顺推送广告过滤, debug = true
+http-response ^https?:\/\/notice\.10jqka\.com\.cn script-path = https://raw.githubusercontent.com/Keywos/rule/main/script/ths/ths.js, requires-body = true, timeout = 10, tag = 同花顺通知广告过滤, debug = true
+
+[Rule]
+# 广告素材域名直接拦截，节省流量，提前阻断广告加载
+DOMAIN, ad.10jqka.com.cn, REJECT
+DOMAIN, ads.10jqka.com.cn, REJECT
+DOMAIN, adcdn.10jqka.com.cn, REJECT
+DOMAIN, adm.10jqka.com.cn, REJECT
+DOMAIN, tui.10jqka.com.cn, REJECT
+
+# 第三方广告SDK拦截
+DOMAIN-SUFFIX, admob.com, REJECT
+DOMAIN-SUFFIX, gdtimg.com, REJECT
+DOMAIN-SUFFIX, pangle.io, REJECT
+DOMAIN-SUFFIX, umeng.com, REJECT
+DOMAIN-SUFFIX, huawei.com, REJECT
+DOMAIN-SUFFIX, xiaomi.com, REJECT
+DOMAIN-SUFFIX, oasg.cn, REJECT
+
+# 同花顺主域名直连，避免功能误杀，优先级最低
+DOMAIN-SUFFIX, 10jqka.com.cn, DIRECT
